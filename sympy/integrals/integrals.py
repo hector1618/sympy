@@ -525,14 +525,10 @@ class Integral(Expr):
         # the process is terminating even though its recursive.
         args = Add.make_args(f)
         args_m = Mul.make_args(f)
-        if len(args) == 1 and len(args_m) > 1 and len(args_m[0].free_symbols) != 0: # To make sure, args_m[0] is  not a constant.
+        if len(args) == 1 and len(args_m)>1:
             f1 = args_m[0]
             f2 = Mul(*args_m[1:])
             f2_inte = integrate(f2,x)
-            #print 'f1',f1
-            #print 'f2',f2
-            #print 'f2_inte',f2_inte
-            #a = input('Script check')
             if len (args_m) > len(Mul.make_args(f1.diff(x) * f2_inte)):
                 return f1 * f2_inte - integrate(f1.diff(x) * f2_inte ,x)
 
