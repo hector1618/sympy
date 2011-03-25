@@ -1,5 +1,5 @@
 from sympy.core import (Basic, Expr, S, C, Symbol, Wild, Add, sympify, diff,
-                        oo, Tuple, Dummy, Function, Mul, Pow)
+                        oo, Tuple, Dummy, Function, Mul, Pow, numbers)
 
 from sympy.core.symbol import Dummy
 from sympy.integrals.trigonometry import trigintegrate
@@ -334,7 +334,6 @@ class Integral(Expr):
         # There is no trivial answer, so continue
         for xab in self.limits:
             antideriv = self._eval_integral(function, xab[0])
-
             if antideriv is None:
                 newargs = (function, self.__getnewargs__()[1])
                 return self.new(*newargs)
@@ -518,6 +517,25 @@ class Integral(Expr):
         if poly is not None:
             return poly.integrate().as_basic()
 
+        # We need to check this before seperating term with respect to addition because it handles the general case.
+        # integral(f1*f2,x) = f1 * integrate(f2, x) - integrate(f1.diff(x) * integrate(f2,x), x)
+        # We will use the above technique to solve integration.
+        # Since we are putting the following condition
+        #         len (args_m) > len(Mul.make_args(f1.diff(x) * f2_inte))
+        # the process is terminating even though its recursive.
+        args = Add.make_args(f)
+        args_m = Mul.make_args(f)
+        if len(args) == 1 and len(args_m) > 1 and len(args_m[0].free_symbols) != 0: # To make sure, args_m[0] is  not a constant.
+            f1 = args_m[0]
+            f2 = Mul(*args_m[1:])
+            f2_inte = integrate(f2,x)
+            #print 'f1',f1
+            #print 'f2',f2
+            #print 'f2_inte',f2_inte
+            #a = input('Script check')
+            if len (args_m) > len(Mul.make_args(f1.diff(x) * f2_inte)):
+                return f1 * f2_inte - integrate(f1.diff(x) * f2_inte ,x)
+
         # since Integral(f=g1+g2+...) == Integral(g1) + Integral(g2) + ...
         # we are going to handle Add terms separately,
         # if `f` is not Add -- we only have one term
@@ -525,7 +543,6 @@ class Integral(Expr):
         args = Add.make_args(f)
         for g in args:
             coeff, g = g.as_independent(x)
-
             # g(x) = const
             if g is S.One:
                 parts.append(coeff*x)
