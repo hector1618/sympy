@@ -37,8 +37,8 @@ import sympy
 
 # Make sure I have the right Python version.
 if sys.version_info[:2] < (2,5):
-    print "SymPy requires Python 2.5 or newer. Python %d.%d detected" % \
-          sys.version_info[:2]
+    print("SymPy requires Python 2.5 or newer. Python %d.%d detected" % \
+          sys.version_info[:2])
     sys.exit(-1)
 
 # Check that this list is uptodate against the result of the command:
@@ -76,6 +76,7 @@ modules = [
     'sympy.physics.mechanics',
     'sympy.physics.quantum',
     'sympy.plotting',
+    'sympy.plotting.intervalmath',
     'sympy.plotting.pygletplot',
     'sympy.polys',
     'sympy.polys.agca',
@@ -113,7 +114,7 @@ class audit(Command):
         try:
             import pyflakes.scripts.pyflakes as flakes
         except ImportError:
-            print """In order to run the audit, you need to have PyFlakes installed."""
+            print("In order to run the audit, you need to have PyFlakes installed.")
             sys.exit(-1)
         # We don't want to audit external dependencies
         ext = ('mpmath',)
@@ -223,6 +224,7 @@ tests = [
     'sympy.physics.quantum.tests',
     'sympy.physics.tests',
     'sympy.plotting.tests',
+    'sympy.plotting.intervalmath.tests',
     'sympy.polys.tests',
     'sympy.polys.agca.tests',
     'sympy.printing.pretty.tests',

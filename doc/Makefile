@@ -17,6 +17,8 @@ ALLSPHINXOPTS = -d _build/doctrees -D latex_paper_size=$(PAPER) \
 ALLSPHINXOPTSapi = -d _build/doctreesapi -D latex_paper_size=$(PAPER) \
                 $(SPHINXOPTS) api
 
+LANGUAGES = bg cs de fr pl ru sr
+
 .PHONY: help clean html web htmlhelp latex changes linkcheck cheatsheet
 
 help:
@@ -75,18 +77,12 @@ gettext:
 htmli18n:
 	mkdir -p _build/i18n/
 	mkdir -p _build/html/
-	mkdir -p src/i18n/cs/LC_MESSAGES/
-	mkdir -p src/i18n/ru/LC_MESSAGES/
-	mkdir -p src/i18n/bg/LC_MESSAGES/
-	msgfmt src/tutorial.cs.po -o src/i18n/cs/LC_MESSAGES/tutorial.mo
-	msgfmt src/tutorial.ru.po -o src/i18n/ru/LC_MESSAGES/tutorial.mo
-	msgfmt src/tutorial.bg.po -o src/i18n/bg/LC_MESSAGES/tutorial.mo
-	$(SPHINXBUILD) -b html -D language=cs $(ALLSPHINXOPTS) _build/i18n/cs src/tutorial.rst
-	$(SPHINXBUILD) -b html -D language=ru $(ALLSPHINXOPTS) _build/i18n/ru src/tutorial.rst
-	$(SPHINXBUILD) -b html -D language=bg $(ALLSPHINXOPTS) _build/i18n/bg src/tutorial.rst
-	cp _build/i18n/cs/tutorial.html _build/html/tutorial.cs.html
-	cp _build/i18n/ru/tutorial.html _build/html/tutorial.ru.html
-	cp _build/i18n/bg/tutorial.html _build/html/tutorial.bg.html
+	for l in $(LANGUAGES); do \
+		mkdir -p src/i18n/$$l/LC_MESSAGES/ ; \
+		msgfmt src/tutorial.$$l.po -o src/i18n/$$l/LC_MESSAGES/tutorial.mo ; \
+		$(SPHINXBUILD) -b html -D language=$$l $(ALLSPHINXOPTS) _build/i18n/$$l src/tutorial.rst ; \
+		cp _build/i18n/$$l/tutorial.html _build/html/tutorial.$$l.html ; \
+	done
 
 web:
 	mkdir -p _build/web _build/doctrees
